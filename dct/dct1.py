@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import compute_base_matrix
-
-plt.style.use(
-    "https://github.com/dhaitz/matplotlib-stylesheets/raw/master/pitayasmoothie-light.mplstyle"
-)
+from .utils import compute_base_matrix
 
 
 def dct_1D(f):
@@ -15,9 +11,9 @@ def dct_1D(f):
     c = D @ f
     return c
 
+
 def idct_1D(c):
-    """
-    """
+    """ """
     D = compute_base_matrix(len(c))
     # D.T is equal to D^-1 since D is orthogonal
     # c = D @ f -> f = D^-1 @ c = D.T @ c
@@ -26,6 +22,9 @@ def idct_1D(c):
 
 
 def visualize_dct_1D(f, compression):
+    plt.style.use(
+        "https://github.com/dhaitz/matplotlib-stylesheets/raw/master/pitayasmoothie-light.mplstyle"
+    )
     # Sampling the function f at N equidistant points
     N = 100
     f_vect = np.empty(N)
@@ -47,7 +46,7 @@ def visualize_dct_1D(f, compression):
     plt.title("DCT coefficients")
 
     # Truncating coefficients
-    c_trunc = c
+    c_trunc = c.copy()
     c_trunc[round(N * compression) :] = 0
 
     # Plotting truncated DCT coefficients
