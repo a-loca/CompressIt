@@ -62,7 +62,7 @@ class HomePage(ctk.CTkFrame):
         button = ctk.CTkButton(
             master=content_frame,
             text="Choose File",
-            width=180,
+            width=140,
             height=36,
             command=self.select_file,
             font=("Roboto", 16),
