@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import os
 from PIL import Image
+from dct import jpg_compression
+import math
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -18,7 +20,7 @@ class App(ctk.CTk):
 
         self.pages = {}  # collect instances of pages' class
         self.page_sizes = {
-            "HomePage": "600x700",
+            "HomePage": "550x700",
             "ImageViewerPage": "1200x700",
         }
 
@@ -203,7 +205,7 @@ class HomePage(ctk.CTkFrame):
 
         # Check that d is in [0, 2F-2]
         self.d = int(d_content)
-        if not (self.d > 0 and self.d < 2 * self.f - 2):
+        if not (self.d >= 0 and self.d <= 2 * self.f - 2):
             self._show_error(f"ERROR: d needs to be in [0, {2 * self.f - 2}].")
             return False
 
@@ -224,7 +226,9 @@ class HomePage(ctk.CTkFrame):
         if self.check_inputs():
             if self.check_file():
                 # Change page and compress
-                self.controller.pages["ImageViewerPage"].setImage(self.filename)
+                self.controller.pages["ImageViewerPage"].setImage(
+                    self.filename, self.f, self.d
+                )
                 self.controller.switch_to_page("ImageViewerPage")
 
 
@@ -265,7 +269,7 @@ class ImageViewerPage(ctk.CTkFrame):
 
         # Option to download image
 
-    def setImage(self, image):
+    def setImage(self, image, f, d):
 
         # Save image path as class attribute to set default
         # name for compressed image when saving it
@@ -273,28 +277,42 @@ class ImageViewerPage(ctk.CTkFrame):
 
         # Open image with PIL
         img = Image.open(image)
-        print(type(img))
+        # Some test images have 3 channels even though they are gray scale
+        # forcing a conversion to gray scale removes superfluous channels
+        img = img.convert("L")
         width, height = img.size
 
-        # Scaling image
+        # Compress image
+        self.compressed_image = jpg_compression(img, f, d)
+
+        # Resize images
         max_img_width = 500
         scale_factor = max_img_width / width
 
+        resized_img = img.resize(
+            (math.floor(width * scale_factor), math.floor(height * scale_factor)),
+            Image.NEAREST,
+        )
+
+        resized_compressed_image = self.compressed_image.resize(
+            (math.floor(width * scale_factor), math.floor(height * scale_factor)),
+            Image.NEAREST,
+        )
+
         ctk_img = ctk.CTkImage(
-            light_image=img,
-            dark_image=img,
-            size=(width * scale_factor, height * scale_factor),
+            light_image=resized_img, dark_image=resized_img, size=resized_img.size
+        )
+        ctk_compressed_img = ctk.CTkImage(
+            light_image=resized_compressed_image,
+            dark_image=resized_compressed_image,
+            size=resized_compressed_image.size,
         )
 
         # Display original image
         self.original_image_label.configure(image=ctk_img)
 
-        # Compress image
-        # self.compressed_image = compress(img)
-        self.compressed_image = img
-
         # Display compressed image
-        self.compressed_image_label.configure(image=ctk_img)
+        self.compressed_image_label.configure(image=ctk_compressed_img)
 
     def save_image(self):
         # Open file browser to save image
