@@ -2,6 +2,7 @@ import customtkinter as ctk
 import os
 from PIL import Image
 from dct import jpg_compression
+from io import BytesIO
 import math
 
 ctk.set_appearance_mode("dark")
@@ -21,7 +22,7 @@ class App(ctk.CTk):
         self.pages = {}  # collect instances of pages' class
         self.page_sizes = {
             "HomePage": "550x700",
-            "ImageViewerPage": "1200x700",
+            "ImageViewerPage": "1400x900",
         }
 
         for PageClass in (HomePage, ImageViewerPage):
@@ -237,6 +238,7 @@ class ImageViewerPage(ctk.CTkFrame):
         super().__init__(parent)
         self.filename = ""
 
+        # Back to home page button
         go_back_button = ctk.CTkButton(
             self,
             text="← Go Back",
@@ -246,18 +248,18 @@ class ImageViewerPage(ctk.CTkFrame):
         )
         go_back_button.place(relx=0.02, rely=0.02, anchor="nw")
 
+        # Save button
         save_button = ctk.CTkButton(
             self, text="Save JPG", width=140, height=28, command=self.save_image
         )
 
         save_button.place(relx=0.98, rely=0.02, anchor="ne")
 
+        # Outer frame
         frame = ctk.CTkFrame(self, fg_color="transparent")
         frame.place(relx=0.5, rely=0.5, anchor="center")
         frame.columnconfigure(0, weight=1)
         frame.columnconfigure(1, weight=1)
-
-        # Compress image
 
         # Show regular image
         self.original_image_label = ctk.CTkLabel(frame, text="")
@@ -267,10 +269,17 @@ class ImageViewerPage(ctk.CTkFrame):
         self.compressed_image_label = ctk.CTkLabel(frame, text="")
         self.compressed_image_label.grid(row=0, column=1, padx=20, pady=10)
 
-        # Option to download image
+        # Info about the image and params
+        self.info_label = ctk.CTkLabel(
+            self,
+            fg_color="transparent",
+            bg_color="transparent",
+            text="",
+            font=("Roboto", 15),
+        )
+        self.info_label.place(relx=0.5, rely=0.98, anchor="s")
 
     def setImage(self, image, f, d):
-
         # Save image path as class attribute to set default
         # name for compressed image when saving it
         self.image_path = image
@@ -285,8 +294,16 @@ class ImageViewerPage(ctk.CTkFrame):
         # Compress image
         self.compressed_image = jpg_compression(img, f, d)
 
+        # Print info on screen
+        self.info_label.configure(
+            text=f"Image size:{width}x{height} \t\t"
+            + f"Params: F = {f}, d = {d} \t"
+            + f"Original size (.bmp): {self._bytes_to_string(os.path.getsize(image))} \t\t"
+            + f"Compressed size (.jpg): {self._bytes_to_string(self._get_image_size_in_bytes(self.compressed_image))}"
+        )
+
         # Resize images
-        max_img_width = 500
+        max_img_width = 600
         scale_factor = max_img_width / width
 
         resized_img = img.resize(
@@ -325,6 +342,20 @@ class ImageViewerPage(ctk.CTkFrame):
         # If user selected a path to save image to
         if path:
             self.compressed_image.save(path, "JPEG")
+
+    def _get_image_size_in_bytes(self, img, format="JPEG"):
+        buffer = BytesIO()
+        # Simulate saving file to get its size
+        img.save(buffer, format=format)
+        return len(buffer.getvalue())
+
+    def _bytes_to_string(self, bytes):
+        if bytes > 1e6:
+            return f"{bytes / 1e6 :.2f} MB"
+        elif bytes > 1e3:
+            return f"{bytes / 1e3 : .2f} kB"
+        else:
+            return f"{bytes} B"
 
 
 if __name__ == "__main__":
