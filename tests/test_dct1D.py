@@ -1,25 +1,6 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from .utils import compute_base_matrix
-
-
-def dct_1D(f):
-    """ """
-    # Computing orthonormal basis for DCP transform
-    D = compute_base_matrix(len(f))
-    # Dot product of each basis vector and function's samples vector
-    c = D @ f
-    return c
-
-
-def idct_1D(c):
-    """ """
-    D = compute_base_matrix(len(c))
-    # D.T is equal to D^-1 since D is orthogonal
-    # c = D @ f -> f = D^-1 @ c = D.T @ c
-    f = D.T @ c
-    return f
-
+import numpy as np
+from dct.dct1D import dct_1D, idct_1D
 
 def visualize_dct_1D(f, compression):
     plt.style.use(
@@ -27,23 +8,29 @@ def visualize_dct_1D(f, compression):
     )
     # Sampling the function f at N equidistant points
     N = 100
-    f_vect = np.empty(N)
-    for i in range(N):
-        f_vect[i] = f((2 * i + 1) / (2 * N))
+    x = (2 * np.arange(N) + 1) / (2 * N)
+    f_vect = np.array([f(xi) for xi in x])
 
     c = dct_1D(f_vect)
+
+    # Optional: thresholding small coefficients
+    c[np.abs(c) < 1e-12] = 0
 
     plt.figure(figsize=(12, 6))
 
     # Plotting sampled function
     plt.subplot(2, 2, 1)
-    plt.plot(f_vect)
+    plt.plot(x, f_vect)
     plt.title("Sampled function")
+    plt.xlabel("x")
+    plt.ylabel("f(x)")
 
     # Plotting DCT coefficients
     plt.subplot(2, 2, 2)
     plt.bar(np.arange(N), c, width=1.0)
     plt.title("DCT coefficients")
+    plt.xlabel("Frequency (k)")
+    plt.ylabel("Coefficient")
 
     # Truncating coefficients
     c_trunc = c.copy()
@@ -52,24 +39,28 @@ def visualize_dct_1D(f, compression):
     # Plotting truncated DCT coefficients
     plt.subplot(2, 2, 3)
     plt.bar(np.arange(N), c_trunc, width=1.0)
-    plt.title(f"Truncated DCT coefficients at {compression*100}% compression")
+    plt.title(f"Truncated DCT coefficients at {(1-compression)*100:.0f}% compression")
+    plt.xlabel("Frequency (k)")
+    plt.ylabel("Coefficient")
 
     # Calculating IDCT
     f_trunc = idct_1D(c_trunc)
 
     # Plotting "compressed" function
     plt.subplot(2, 2, 4)
-    plt.plot(f_trunc)
+    plt.plot(x, f_trunc)
     plt.title("Compressed function")
+    plt.xlabel("x")
+    plt.ylabel("f(x)")
 
+    plt.tight_layout()
     plt.show()
 
 
-# Defining main function
 def main():
     f = lambda x: 0 if x - 0.5 < 0 else 1
     # f = lambda x: 1
-    visualize_dct_1D(f, 0.8)
+    visualize_dct_1D(f, 1)
 
 
 if __name__ == "__main__":

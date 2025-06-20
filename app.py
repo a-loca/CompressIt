@@ -12,7 +12,7 @@ ctk.set_default_color_theme("dark-blue")
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("DCTCompress")
+        self.title("CompressIt")
 
         self.container = ctk.CTkFrame(self, fg_color="transparent")
         self.container.pack(fill="both", expand=True)
@@ -227,7 +227,7 @@ class HomePage(ctk.CTkFrame):
         if self.check_inputs():
             if self.check_file():
                 # Change page and compress
-                self.controller.pages["ImageViewerPage"].setImage(
+                self.controller.pages["ImageViewerPage"].set_image(
                     self.filename, self.f, self.d
                 )
                 self.controller.switch_to_page("ImageViewerPage")
@@ -279,7 +279,7 @@ class ImageViewerPage(ctk.CTkFrame):
         )
         self.info_label.place(relx=0.5, rely=0.98, anchor="s")
 
-    def setImage(self, image, f, d):
+    def set_image(self, image, f, d):
         # Save image path as class attribute to set default
         # name for compressed image when saving it
         self.image_path = image

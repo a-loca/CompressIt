@@ -1,5 +1,5 @@
 from scipy.fft import dct
-from dct.dct2 import dct_2D
+from dct.dct2D import dct_2D
 import numpy as np
 import time
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ def main():
     lib_times_t = []  # should be O(N^2log(N))
 
     # test_sizes = [4, 8, 16, 24, 32, 48, 56, 64, 92, 128, 156, 192, 256]
-    test_sizes = [2 + 8 * i for i in range(20)]
+    test_sizes = [2 + 8 * i for i in range(50)]
     print(test_sizes)
 
     np.random.seed(42)
@@ -66,16 +66,16 @@ def main():
 
     # Plot result
     plt.figure(figsize=(12, 6))
-    # plt.plot(test_sizes, cust_times, label="Custom DCT", marker="o")
+    plt.plot(test_sizes, cust_times, label="Custom DCT", marker="o")
     plt.plot(test_sizes, lib_times, label="Scipy DCT", marker="o")
-    # plt.plot(
-    #     test_sizes, cust_times_t, linestyle="dashed", label="Custom DCT complexity"
-    # )
-    # plt.plot(test_sizes, lib_times_t, linestyle="dashed", label="Scipy DCT complexity")
+    plt.plot(
+         test_sizes, cust_times_t, linestyle="dashed", label="Custom DCT complexity"
+     )
+    plt.plot(test_sizes, lib_times_t, linestyle="dashed", label="Scipy DCT complexity")
     plt.xlabel("Dimensione matrice N")
     plt.ylabel("Tempo (s)")
     plt.legend()
-    # plt.yscale("log")
+    plt.yscale("log")
 
     plt.show()
 
