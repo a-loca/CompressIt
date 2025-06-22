@@ -109,7 +109,7 @@ def jpg_compression(image, f, d):
 
     compressed_blocks = []
 
-    # Apply DCT to every block
+    # Apply compression to each block
     for block in blocks:
 
         # 1. Apply DCT to block: 1D DCT to columns, then rows
@@ -124,7 +124,7 @@ def jpg_compression(image, f, d):
         # 3. Apply IDCT: 1D IDCT to columns, then rows
         compressed_block = idct(idct(coeff, norm="ortho", axis=1), norm="ortho", axis=0)
 
-        # 4. Round values, then range [0, 255]
+        # 4. Round values, then clip to [0, 255]
         #   np.rint: rounds elements to nearest integer
         #   np.clip: sets elements < min to min and elements > max to max
         compressed_block = np.clip(np.rint(compressed_block), 0, 255).astype(np.uint8)

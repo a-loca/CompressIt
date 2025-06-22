@@ -296,14 +296,14 @@ class ImageViewerPage(ctk.CTkFrame):
 
         # Print info on screen
         self.info_label.configure(
-            text=f"Image size:{width}x{height} \t\t"
+            text=f"Image size: {width}x{height} \t\t"
             + f"Params: F = {f}, d = {d} \t"
             + f"Original size (.bmp): {self._bytes_to_string(os.path.getsize(image))} \t\t"
             + f"Compressed size (.jpg): {self._bytes_to_string(self._get_image_size_in_bytes(self.compressed_image))}"
         )
 
         # Resize images
-        max_img_width = 600
+        max_img_width = 500
         scale_factor = max_img_width / width
 
         resized_img = img.resize(
@@ -341,7 +341,9 @@ class ImageViewerPage(ctk.CTkFrame):
         )
         # If user selected a path to save image to
         if path:
-            self.compressed_image.save(path, "JPEG")
+            self.compressed_image.save(
+                path, "JPEG", quality=100, subsampling=0, optimize=True
+            )
 
     def _get_image_size_in_bytes(self, img, format="JPEG"):
         buffer = BytesIO()
