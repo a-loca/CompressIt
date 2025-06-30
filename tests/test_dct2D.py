@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dct.dct2D import dct_2D, idct_2D
 
+
 def visualize_dct_2D(f, compression):
     plt.style.use(
         "https://github.com/dhaitz/matplotlib-stylesheets/raw/master/pitayasmoothie-light.mplstyle"
@@ -93,7 +94,7 @@ def main():
     # f = lambda x, y: 1
     sign = lambda x: 0 if x - 0.5 < 0 else 1
     f = lambda x, y: sign(x) * sign(y)
-    visualize_dct_2D(f, 1)
+    visualize_dct_2D(f, 0.8)
 
 
 if __name__ == "__main__":

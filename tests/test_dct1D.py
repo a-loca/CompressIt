@@ -60,7 +60,7 @@ def visualize_dct_1D(f, compression):
 def main():
     f = lambda x: 0 if x - 0.5 < 0 else 1
     # f = lambda x: 1
-    visualize_dct_1D(f, 1)
+    visualize_dct_1D(f, 0.8)
 
 
 if __name__ == "__main__":

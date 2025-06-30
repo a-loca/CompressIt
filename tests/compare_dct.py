@@ -17,8 +17,8 @@ def main():
     cust_times_t = []  # should be O(N^3)
     lib_times_t = []  # should be O(N^2log(N))
 
-    # test_sizes = [2**i for i in range(3, 10)]
-    test_sizes = np.arange(8, 513, 2) # [8, 512] with step 2
+    test_sizes = [2**i for i in range(3, 13)]
+    # test_sizes = np.arange(8, 513, 2) # [8, 512] with step 2
     print(test_sizes)
 
     np.random.seed(42)
